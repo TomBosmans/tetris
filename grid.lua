@@ -2,19 +2,21 @@ local Grid = {}
 Grid.__index = Grid
 
 function Grid:create(...)
-   setmetatable(self,Grid)
-   return self
+   local grid = {}
+   setmetatable(grid,Grid)
+
+   grid.columns = self.columns
+   grid.rows = self.rows
+   grid.blockSize = self.blockSize
+
+   return grid
 end
 
 function Grid:draw()
    for rowIndex = 1, self.rows do
-      self:drawRow(rowIndex)
-   end
-end
-
-function Grid:drawRow(rowIndex)
-   for columnIndex = 1, self.columns do
-      self:drawCell(rowIndex, columnIndex)
+      for columnIndex = 1, self.columns do
+	 self:drawCell(rowIndex, columnIndex)
+      end
    end
 end
 
@@ -23,7 +25,7 @@ function Grid:drawCell(rowIndex, columnIndex)
    y = (columnIndex -1) * self.blockSize
 
    width = self.blockSize - 1
-   height = self.blockSize - 1
+   height = width
 
    love.graphics.rectangle('fill', x, y, width, height)
 end
