@@ -1,14 +1,19 @@
+local Inert = require('inert')
+
 local Grid = {}
 Grid.__index = Grid
 
 function Grid:create(...)
    local grid = {}
-   setmetatable(grid,Grid)
+   setmetatable(grid, Grid)
 
    grid.columns = self.columns
    grid.rows = self.rows
    grid.cellSize = self.cellSize
-   grid.inert = grid:createInert()
+   grid.inert = Inert.create {
+      columns=grid.columns,
+      rows = grid.rows
+   }
 
    return grid
 end
@@ -33,17 +38,27 @@ function Grid:drawCell(cell, columnIndex, rowIndex)
    love.graphics.rectangle('fill', x, y, width, height)
 end
 
-function Grid:createInert()
-   local inert = {}
-
+function Grid:removeCompleteRows()
    for rowIndex = 1, self.rows do
-      inert[rowIndex] = {}
+      local complete = true
       for columnIndex = 1, self.columns do
-	 inert[rowIndex][columnIndex] = ' '
+	 if self.inert[rowIndex][columnIndex] == ' ' then
+	    complete = false
+	 end
+      end
+
+      if complete then
+	 for removeRowIndex = rowIndex, 2, -1 do
+	    for removeColumnIndex = 1, self.columns do
+	       self.inert[removeRowIndex][removeColumnIndex] = self.inert[removeRowIndex - 1][removeColumnIndex]
+	    end
+	 end
+	 
+	 for removeColumnIndex = 1, self.columns do
+	    self.inert[1][removeColumnIndex] = ' '
+	 end
       end
    end
-
-   return inert
 end
 
 return Grid

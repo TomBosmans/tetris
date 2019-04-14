@@ -1,3 +1,4 @@
+BLOCK_TYPES = { 'i', 'j', 'l', 'o', 's', 't', 'z' }
 BLOCK_COLORS = require('block_colors')
 BLOCK_SHAPES = require('block_shapes')
 
@@ -12,6 +13,8 @@ end
 function love.load()
    love.graphics.setBackgroundColor(255, 255, 255)
 
+   timer = 0
+
    grid = Grid.create {
       columns=10,
       rows=18,
@@ -19,7 +22,6 @@ function love.load()
    }
 
    block = Block.create {
-      type='i',
       rotation=1,
       offsetX=3,
       offsetY=0,
@@ -28,7 +30,22 @@ function love.load()
 end
 
 function love.update(dt)
-   block:fall(dt)
+   timer = timer + dt
+   local timerLimit = 0.5
+   if timer >= timerLimit then
+      timer = timer - timerLimit
+      if not block:moveDown() then
+	 block:rest()
+	 block = Block.create {
+	    rotation=1,
+	    offsetX=3,
+	    offsetY=0,
+	    grid=grid
+	 }
+      end
+   end
+
+   grid:removeCompleteRows()
 end
 
 function love.keypressed(key)

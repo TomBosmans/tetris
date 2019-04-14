@@ -5,12 +5,11 @@ function Block:create(...)
    local block = {}
    setmetatable(block, Block)
 
-   block.type = self.type
+   block.type = BLOCK_TYPES[love.math.random(7)]
    block.rotation = self.rotation
    block.grid = self.grid
    block.offsetX = self.offsetX
    block.offsetY = self.offsetY
-   block.timer = 0
 
    return block
 end
@@ -24,7 +23,9 @@ function Block:draw()
 	 local x = columnIndex + self.offsetX
 	 local y = rowIndex + self.offsetY
 
-	 self.grid:drawCell(cell, x, y)
+	 if cell ~= ' ' then
+	    self.grid:drawCell(cell, x, y)
+	 end
       end
    end
 end
@@ -71,18 +72,13 @@ end
 
 function Block:moveDown()
    local offsetY = self.offsetY + 1
+
    if self:canMove { offsetY=offsetY } then
       self.offsetY = offsetY
+      return true
    end
-end
 
-function Block:fall(dt)
-   self.timer = self.timer + dt
-   local timerLimit = 0.5
-   if self.timer >= timerLimit then
-      self.timer = self.timer - timerLimit
-      self:moveDown()
-   end
+   return false
 end
 
 function Block:canMove(args)
@@ -109,6 +105,19 @@ function Block:canMove(args)
    end
    
    return true
+end
+
+function Block:rest()
+   local shape = BLOCK_SHAPES[self.type][self.rotation]
+
+   for rowIndex = 1, 4 do
+      for columnIndex = 1, 4 do
+	 local cell = shape[rowIndex][columnIndex]
+	 if cell ~= ' ' then
+	    self.grid.inert[self.offsetY + rowIndex][self.offsetX + columnIndex] = cell
+	 end
+      end
+   end
 end
 
 return Block
