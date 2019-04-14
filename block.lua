@@ -6,10 +6,12 @@ function Block:create(...)
    setmetatable(block, Block)
 
    block.type = BLOCK_TYPES[love.math.random(7)]
-   block.rotation = self.rotation
    block.grid = self.grid
-   block.offsetX = self.offsetX
-   block.offsetY = self.offsetY
+
+   block.rotation = 1
+   block.offsetX = 3
+   block.offsetY = 0
+   block.timer = 0
 
    return block
 end
@@ -105,6 +107,19 @@ function Block:canMove(args)
    end
    
    return true
+end
+
+function Block:drop(dt)
+   self.timer = self.timer + dt
+   local timerLimit = 0.5
+
+   if self.timer >= timerLimit then
+      self.timer = self.timer - timerLimit
+      if not self:moveDown() then
+	 self:rest()
+	 self.grid:next()
+      end
+   end
 end
 
 function Block:rest()

@@ -1,4 +1,5 @@
 local Inert = require('inert')
+local Block = require('block')
 
 local Grid = {}
 Grid.__index = Grid
@@ -10,6 +11,10 @@ function Grid:create(...)
    grid.columns = self.columns
    grid.rows = self.rows
    grid.cellSize = self.cellSize
+
+   grid.currentBlock = Block.create { grid=grid }
+   grid.nextBlock = Block.create { grid=grid }
+
    grid.inert = Inert.create {
       columns=grid.columns,
       rows = grid.rows
@@ -59,6 +64,11 @@ function Grid:removeCompleteRows()
 	 end
       end
    end
+end
+
+function Grid:next()
+   self.currentBlock = self.nextBlock
+   self.nextBlock = Block.create { grid=self }
 end
 
 return Grid
