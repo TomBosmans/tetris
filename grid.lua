@@ -7,7 +7,8 @@ function Grid:create(...)
 
    grid.columns = self.columns
    grid.rows = self.rows
-   grid.blockSize = self.blockSize
+   grid.cellSize = self.cellSize
+   grid.inert = grid:createInert()
 
    return grid
 end
@@ -15,19 +16,34 @@ end
 function Grid:draw()
    for rowIndex = 1, self.rows do
       for columnIndex = 1, self.columns do
-	 self:drawCell(rowIndex, columnIndex)
+	 cell = self.inert[rowIndex][columnIndex]
+	 self:drawCell(cell, rowIndex, columnIndex)
       end
    end
 end
 
-function Grid:drawCell(rowIndex, columnIndex)
-   x = (rowIndex - 1) * self.blockSize
-   y = (columnIndex -1) * self.blockSize
+function Grid:drawCell(cell, rowIndex, columnIndex)
+   x = (rowIndex - 1) * self.cellSize
+   y = (columnIndex -1) * self.cellSize
 
-   width = self.blockSize - 1
+   width = self.cellSize - 1
    height = width
 
+   love.graphics.setColor(BLOCK_COLORS[cell])
    love.graphics.rectangle('fill', x, y, width, height)
+end
+
+function Grid:createInert()
+   local inert = {}
+
+   for rowIndex = 1, self.rows do
+      inert[rowIndex] = {}
+      for columnIndex = 1, self.columns do
+	 inert[rowIndex][columnIndex] = ' '
+      end
+   end
+
+   return inert
 end
 
 return Grid
