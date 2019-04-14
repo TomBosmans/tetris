@@ -17,14 +17,14 @@ function Grid:draw()
    for rowIndex = 1, self.rows do
       for columnIndex = 1, self.columns do
 	 cell = self.inert[rowIndex][columnIndex]
-	 self:drawCell(cell, rowIndex, columnIndex)
+	 self:drawCell(cell, columnIndex, rowIndex)
       end
    end
 end
 
-function Grid:drawCell(cell, rowIndex, columnIndex)
-   x = (rowIndex - 1) * self.cellSize
-   y = (columnIndex -1) * self.cellSize
+function Grid:drawCell(cell, columnIndex, rowIndex)
+   x = (columnIndex -1) * self.cellSize
+   y = (rowIndex - 1) * self.cellSize
 
    width = self.cellSize - 1
    height = width
