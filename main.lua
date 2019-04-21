@@ -1,36 +1,39 @@
+-- https://simplegametutorials.github.io/blocks/
+
 BLOCK_TYPES = { 'i', 'j', 'l', 'o', 's', 't', 'z' }
 BLOCK_COLORS = require('block_colors')
 BLOCK_SHAPES = require('block_shapes')
 
-local Grid = require('grid')
+local Playfield = require('playfield')
 
 function love.draw()
-   grid:draw()
-   grid.currentBlock:draw()
+   playfield:draw()
 end
 
 function love.load()
    love.graphics.setBackgroundColor(255, 255, 255)
 
-   timer = 0
-   grid = Grid.create { columns=10, rows=18, cellSize=20, }
+   keyBindings= {
+      rotateRight='w',
+      rotateLeft='q',
+      moveLeft='a',
+      moveRight='d',
+      moveDown='s'
+   }
+
+   playfield = Playfield.create {
+      timer=0,
+      timerLimit=0.5,
+      keyBindings=keyBindings,
+      offsetX=2,
+      offsetY=5
+   }
 end
 
 function love.update(dt)
-   grid.currentBlock:drop(dt)
-   grid:removeCompleteRows()
+   playfield:update(dt)
 end
 
 function love.keypressed(key)
-   if key == 'w' then
-      grid.currentBlock:rotateRight()
-   elseif key == 'q' then
-      grid.currentBlock:rotateLeft()
-   elseif key == 'a' then
-      grid.currentBlock:moveLeft()
-   elseif key == 'd' then
-      grid.currentBlock:moveRight()
-   elseif key == 's' then
-      grid.currentBlock:moveDown()
-   end
+   playfield:keypressed(key)
 end

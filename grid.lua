@@ -8,16 +8,19 @@ function Grid:create(...)
    local grid = {}
    setmetatable(grid, Grid)
 
-   grid.columns = self.columns
-   grid.rows = self.rows
-   grid.cellSize = self.cellSize
+   grid.offsetX = self.offsetX
+   grid.offsetY = self.offsetY
+
+   grid.columns = 10
+   grid.rows = 18
+   grid.cellSize = 20
 
    grid.currentBlock = Block.create { grid=grid }
    grid.nextBlock = Block.create { grid=grid }
 
    grid.inert = Inert.create {
       columns=grid.columns,
-      rows = grid.rows
+      rows=grid.rows
    }
 
    return grid
@@ -33,6 +36,9 @@ function Grid:draw()
 end
 
 function Grid:drawCell(cell, columnIndex, rowIndex)
+   columnIndex = columnIndex + self.offsetX
+   rowIndex = rowIndex + self.offsetY
+
    x = (columnIndex -1) * self.cellSize
    y = (rowIndex - 1) * self.cellSize
 
@@ -69,6 +75,10 @@ end
 function Grid:next()
    self.currentBlock = self.nextBlock
    self.nextBlock = Block.create { grid=self }
+
+   if not self.nextBlock:canMove() then
+      love.load()
+   end
 end
 
 return Grid

@@ -11,7 +11,6 @@ function Block:create(...)
    block.rotation = 1
    block.offsetX = 3
    block.offsetY = 0
-   block.timer = 0
 
    return block
 end
@@ -77,13 +76,14 @@ function Block:moveDown()
 
    if self:canMove { offsetY=offsetY } then
       self.offsetY = offsetY
-      return true
+   else
+      self:rest()
+      self.grid:next()
    end
-
-   return false
 end
 
 function Block:canMove(args)
+   local args = args or {} -- for when no args are given.
    local offsetX = args.offsetX or self.offsetX
    local offsetY = args.offsetY or self.offsetY
    local rotation = args.rotation or self.rotation
@@ -107,19 +107,6 @@ function Block:canMove(args)
    end
    
    return true
-end
-
-function Block:drop(dt)
-   self.timer = self.timer + dt
-   local timerLimit = 0.5
-
-   if self.timer >= timerLimit then
-      self.timer = self.timer - timerLimit
-      if not self:moveDown() then
-	 self:rest()
-	 self.grid:next()
-      end
-   end
 end
 
 function Block:rest()
