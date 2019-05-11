@@ -8,50 +8,55 @@ function Grid:create(...)
    local grid = {}
    setmetatable(grid, Grid)
 
-   grid.offsetX = self.offsetX
-   grid.offsetY = self.offsetY
-
    grid.columns = 10
    grid.rows = 18
    grid.cellSize = 20
 
+   grid.offsetX = self.offsetX/grid.cellSize - grid.columns/2
+   grid.offsetY = self.offsetY/grid.cellSize - grid.rows/2
+
    grid.currentBlock = Block.create { grid=grid }
    grid.nextBlock = Block.create { grid=grid }
-
-   grid.inert = Inert.create {
-      columns=grid.columns,
-      rows=grid.rows
-   }
+   grid.inert = Inert.create {columns=grid.columns, rows=grid.rows}
 
    return grid
 end
 
 function Grid:draw()
+   love.graphics.setColor(1, 1, 1)
+   love.graphics.rectangle('line', self.offsetX * self.cellSize, self.offsetY * self.cellSize, self.columns * self.cellSize, self.rows * self.cellSize)
+
    for rowIndex = 1, self.rows do
       for columnIndex = 1, self.columns do
-	 cell = self.inert[rowIndex][columnIndex]
+	 local cell = self.inert[rowIndex][columnIndex]
 	 self:drawCell(cell, columnIndex, rowIndex)
       end
    end
 end
 
 function Grid:drawCell(cell, columnIndex, rowIndex)
-   columnIndex = columnIndex + self.offsetX
-   rowIndex = rowIndex + self.offsetY
+   local x = (columnIndex + self.offsetX -1) * self.cellSize
+   local y = (rowIndex + self.offsetY - 1) * self.cellSize
 
-   x = (columnIndex -1) * self.cellSize
-   y = (rowIndex - 1) * self.cellSize
+   local size = self.cellSize - 1
+   local color = BLOCK_COLORS[cell]
 
-   width = self.cellSize - 1
-   height = width
+   love.graphics.setColor(color[1] * .60, color[2] * .60, color[3] * .60)
+   love.graphics.rectangle('fill', x, y, size, size)
 
-   love.graphics.setColor(BLOCK_COLORS[cell])
-   love.graphics.rectangle('fill', x, y, width, height)
+   love.graphics.setColor(color[1] * .255, color[2] * .255, color[3] * .255)
+   love.graphics.rectangle('fill', x + 2, y + 2, size - 4, size - 4)
+
+   love.graphics.setColor(color[1] * .160, color[2] * .160, color[3] * .160)
+   love.graphics.rectangle('fill', x + 6, y + 6, size - 12, size - 12)
 end
 
 function Grid:removeCompleteRows()
+   local total = 0
+
    for rowIndex = 1, self.rows do
       local complete = true
+
       for columnIndex = 1, self.columns do
 	 if self.inert[rowIndex][columnIndex] == ' ' then
 	    complete = false
@@ -59,6 +64,8 @@ function Grid:removeCompleteRows()
       end
 
       if complete then
+	 total = total + 1
+
 	 for removeRowIndex = rowIndex, 2, -1 do
 	    for removeColumnIndex = 1, self.columns do
 	       self.inert[removeRowIndex][removeColumnIndex] = self.inert[removeRowIndex - 1][removeColumnIndex]
@@ -70,6 +77,8 @@ function Grid:removeCompleteRows()
 	 end
       end
    end
+
+   return total
 end
 
 function Grid:next()

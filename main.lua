@@ -1,17 +1,24 @@
--- https://simplegametutorials.github.io/blocks/
-
 BLOCK_TYPES = { 'i', 'j', 'l', 'o', 's', 't', 'z' }
 BLOCK_COLORS = require('block_colors')
 BLOCK_SHAPES = require('block_shapes')
+SCORES_PER_LINES = { 40, 100, 300, 1200 }
+SPEED_PER_LEVEL = {
+   48, 43, 38, 33, 28, 23, 18, 13, 8, 6,
+   5, 5, 5, 4, 4, 4, 3, 3, 3,
+   2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+   1
+}
 
 local Playfield = require('playfield')
 
 function love.draw()
+   love.graphics.setBackgroundColor(.04, .04, .04)
    playfield:draw()
 end
 
 function love.load()
-   love.graphics.setBackgroundColor(255, 255, 255)
+   love.window.setFullscreen(true, "desktop")
+   local width, height = love.graphics.getDimensions()
 
    keyBindings= {
       rotateRight='w',
@@ -22,11 +29,10 @@ function love.load()
    }
 
    playfield = Playfield.create {
-      timer=0,
-      timerLimit=0.5,
+      level=5,
       keyBindings=keyBindings,
-      offsetX=2,
-      offsetY=5
+      offsetX=width/2,
+      offsetY=height/2
    }
 end
 
